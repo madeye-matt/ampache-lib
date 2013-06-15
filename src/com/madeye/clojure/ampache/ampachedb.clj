@@ -81,10 +81,6 @@
 ; Regexp for parsing valid prefixes
 (def prefix-regexp (re-pattern (str "(" (reduce #(str %1 "|" %2) prefixes) ")\\s(.*)|.*") ))
 
-;(defn- full-name
-;  "Convenience function to get the full name for an artist or album - prefix + name"
-;  [m] (str/trim (str (:prefix m) " " (:name m))))
-
 (defn- prepend-keyword [m prefix] (into {} (for [[k v] m] [(keyword (str prefix "." (name k))) v])))
 
 (defn- name-map 
@@ -97,12 +93,6 @@
   [albumname] (name-map (re-find prefix-regexp albumname))) 
 
 (defn- build-join-map [type name] (prepend-keyword (split-name-string name) type))
-
-; Function to take map with :album tag and create a :name/prefix map
-;(defn- split-name-map [m] (split-name-string (:album m)))
-
-; Function to conj :name/:prefix with original map 
-;(defn- merge-name-prefix [m] (conj m (split-name-map m)))
 
 (defn find-artist 
   "Find an artist with given a map with 'where' parameters"
