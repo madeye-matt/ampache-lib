@@ -3,6 +3,9 @@
 
 (use 'korma.core)
 (require '[clojure.string :as str])
+(require '[clj-time.core :as tm])
+(require '[clj-time.local :as tloc])
+(require '[clj-time.format :as tfmt])
 (require '[com.madeye.clojure.common.common :as c])
 
 (defn reload [] (use :reload-all 'com.madeye.clojure.ampache.ampachedb))
@@ -173,3 +176,33 @@
     )
 )
 
+(defn find-song-listen
+  "Function to list songs listened to over particular time period"
+  [start end]
+  (let [ustart (c/to-unix-time start)
+        uend (c/to-unix-time end)]
+    (select object_count 
+            (fields [:song.title :song] [:artist.name :artist] [:album.name :album] [:date :timestamp] :user)
+            (join song (= :song.id :object_id))
+            (join artist (= :artist.id :song.artist))
+            (join album (= :album.id :song.album))
+            (where 
+              (and 
+                (= :object_type "song") 
+                ( > :date ustart ) 
+                ( < :date uend ) 
+              )
+            )
+    )
+  )
+)
+
+(def group-artist (partial group-by :artist))
+; Need a juxt to ensure it's not a different album of the same name
+(def group-album (partial group-by (juxt :artist :album)))
+; Ditto different track of the same name
+(def group-song (partial group-by (juxt :artist :album :song)))
+(def group-timestamp (partial group-by :timestamp))
+(def group-user (partial group-by :user))
+
+; (defn group-song-listen-by-artist [] ())

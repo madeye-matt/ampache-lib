@@ -7,6 +7,6 @@
     [org.clojure/clojure "1.5.1"]
     [korma "0.3.0-RC5"]
     [mysql/mysql-connector-java "5.1.25"] 
-    [com.madeye.clojure.common/common "0.1.0"] 
+    [com.madeye.clojure.common/common "0.1.1"] 
   ]
   :main com.madeye.clojure.ampache.ampachedb)

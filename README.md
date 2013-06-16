@@ -56,6 +56,6 @@ None identified so far
 
 ## License
 
-Copyright © 2013 FIXME
+Copyright © 2013 Madeye Software Ltd.
 
 Distributed under the Eclipse Public License, the same as Clojure.
