@@ -19,7 +19,15 @@ maven
 
 ## Usage
 
-This is a library so direct usage is not possible
+In order to use any of the defined functions, a database must be initialised with the (initialise properties-file) function call where propeeties-file is the path to a Java Properties-style file containing database connection parameters.  An example of config.properties is included in the conf directory but repeated here for completeness.
+
+
+    # Database connection parameters
+    database-host=localhost
+    database-port=3306
+    database-db=ampache
+    database-user=ampache
+    database-password=ampache
 
 ## Examples
 
