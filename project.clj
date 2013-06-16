@@ -1,4 +1,4 @@
-(defproject com.madeye.clojure.ampache/ampachedb "0.1.1"
+(defproject com.madeye.clojure.ampache/ampachedb "0.1.2"
   :description "A set of Clojure libraries for interacting with ampache music server through it's database"
   :url "https://github.com/madeye-matt/ampache-lib"
   :license {:name "Eclipse Public License"
