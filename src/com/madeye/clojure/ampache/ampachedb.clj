@@ -129,7 +129,8 @@
 
 (defn find-album 
   "Find an album with given a map with 'where' parameters"
-  [m] (select album (with song) (where m)))
+  [m] (select album (where m)))
+  ;[m] (select album (with song) (where m)))
 (defn find-album-by-name 
   "Find an album with a given name"
   [name] (find-album (split-name-string name)))
@@ -223,7 +224,6 @@
 (def group-timestamp (partial group-by :timestamp))
 (def group-user (partial group-by :user))
 
-; (defn group-song-listen-by-artist [] ())
 (defn top
     "Returns the top n of the supplied plays using the specified group-function (group-artist etc)"
     ([m fn num] (take num (sort c/compare-count-map-desc (map c/count-record (fn m )))))
@@ -235,10 +235,15 @@
   "Accepts a map with :id and :type and returns a map representing the specified artist, album or song"
   [m] (case (:type m) 
         :artist 
-          "artist" 
+          (conj (first (find-artist-by-id (:id m))) { :type :artist })
         :album 
-          "album" 
+          (conj (first (find-album-by-id (:id m))) { :type :album })
         :song 
-          "song"
+          (conj (first (find-song-by-id (:id m))) { :type :song })
       )
 )
+
+(defn transform-top-result 
+  "Function to transform the map returned from 'top' into a map containing metadata about the objects with the count merged in"
+  [topmap] (conj (find-object (:term topmap)) { :count (:count topmap)} ))
+
