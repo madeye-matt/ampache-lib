@@ -29,6 +29,10 @@ In order to use any of the defined functions, a database must be initialised wit
     database-user=ampache
     database-password=ampache
 
+
+    # Default number of items to return in "top n" queries
+    default-top=50
+
 ## Examples
 
     com.madeye.clojure.ampache.ampachedb=> (initialise "config.properties")

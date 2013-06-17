@@ -11,7 +11,7 @@
 (defn reload [] (use :reload-all 'com.madeye.clojure.ampache.ampachedb))
 
 ; Declaring vars that will be initialised by (initialise)
-(declare config database-config db)
+(declare config database-config db default-top)
 (declare artist album song user object_count)
 
 (defn initialise
@@ -25,6 +25,7 @@
         :user (config :database-user)
         :password (config :database-password) }
   )
+  (def default-top (read-string (config :default-top)))
   (korma.db/defdb db
     (korma.db/mysql database-config)) 
 
@@ -206,3 +207,11 @@
 (def group-user (partial group-by :user))
 
 ; (defn group-song-listen-by-artist [] ())
+(defn top
+    "Returns the top n of the supplied plays using the specified group-function (group-artist etc)"
+    ([m fn num] (take num (sort c/compare-count-map-desc (map c/count-record (fn m )))))
+    ([m fn] (top m fn default-top))
+    ([m] (top m group-artist))
+)
+
+
