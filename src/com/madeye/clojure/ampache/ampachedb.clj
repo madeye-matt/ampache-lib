@@ -3,6 +3,7 @@
 
 (use 'korma.core)
 (require '[clojure.string :as str])
+(require '[clojure.xml :as xml])
 (require '[clj-time.core :as tm])
 (require '[clj-time.local :as tloc])
 (require '[clj-time.format :as tfmt])
@@ -203,7 +204,7 @@
 )
 
 ; (defn group-map [m] { :artist (:artist m) :id (:artistid m)})
-(defn group-map [idfn namefn m] { namefn (namefn m) :id (idfn m)})
+(defn group-map [idfn namefn m] { :name (namefn m) :id (idfn m) :type namefn})
 
 (def group-map-artist (partial group-map :artistid :artist))
 (def group-map-album (partial group-map :albumid :album))
@@ -230,4 +231,14 @@
     ([m] (top m group-artist))
 )
 
-
+(defn find-object 
+  "Accepts a map with :id and :type and returns a map representing the specified artist, album or song"
+  [m] (case (:type m) 
+        :artist 
+          "artist" 
+        :album 
+          "album" 
+        :song 
+          "song"
+      )
+)
