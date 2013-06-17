@@ -152,12 +152,16 @@
     ([title albump] (select song (with album) (where (assoc (build-join-map "album" albump) :title title))))
     ([title albump artistp] (select song (with album) (with artist) (where (assoc (conj (build-join-map "album" albump) (build-join-map "artist" (get-artist-name artistp))) :title title ))))
 )
-
 (defn find-song-by-map
     "Utility function to pull the parameters to find-song from a map with the keywords :song, :album, :artist"
     [m]
-    (find-song (:song m) (:album m) (:artist m))
+    (select song (where m))
+;    (find-song (:song m) (:album m) (:artist m))
 )
+
+(defn find-song-by-id 
+  "Find a song with a given id"
+  [id] (find-song-by-map {:id id}))
 
 (defn song-listened 
     "Create a record of a song being listened to at a particular time"
@@ -208,10 +212,13 @@
 ;(def group-artist (partial group-by :artist))
 ;(def group-artist (partial group-by group-map))
 (def group-artist (partial group-by group-map-artist))
+(def group-album (partial group-by group-map-album))
+(def group-song (partial group-by group-map-song))
+; No more juxts needed as we are grouping on id
 ; Need a juxt to ensure it's not a different album of the same name
-(def group-album (partial group-by (juxt :artist :album)))
+; (def group-album (partial group-by (juxt :artist :album)))
 ; Ditto different track of the same name
-(def group-song (partial group-by (juxt :artist :album :song)))
+; (def group-song (partial group-by (juxt :artist :album :song)))
 (def group-timestamp (partial group-by :timestamp))
 (def group-user (partial group-by :user))
 
