@@ -183,7 +183,7 @@
   (let [ustart (c/to-unix-time start)
         uend (c/to-unix-time end)]
     (select object_count 
-            (fields [:song.title :song] [:artist.name :artist] [:album.name :album] [:date :timestamp] :user)
+            (fields [:song.title :song] [:artist.name :artist] [:album.name :album] [:date :timestamp] :user [:song.id :songid] [:artist.id :artistid] [:album.id :albumid])
             (join song (= :song.id :object_id))
             (join artist (= :artist.id :song.artist))
             (join album (= :album.id :song.album))
@@ -198,7 +198,16 @@
   )
 )
 
-(def group-artist (partial group-by :artist))
+; (defn group-map [m] { :artist (:artist m) :id (:artistid m)})
+(defn group-map [idfn namefn m] { namefn (namefn m) :id (idfn m)})
+
+(def group-map-artist (partial group-map :artistid :artist))
+(def group-map-album (partial group-map :albumid :album))
+(def group-map-song (partial group-map :songid :song))
+
+;(def group-artist (partial group-by :artist))
+;(def group-artist (partial group-by group-map))
+(def group-artist (partial group-by group-map-artist))
 ; Need a juxt to ensure it's not a different album of the same name
 (def group-album (partial group-by (juxt :artist :album)))
 ; Ditto different track of the same name
