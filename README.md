@@ -7,14 +7,14 @@ A set of Clojure libraries for interacting with ampache music server through it'
 
 leiningen
 
-    [com.madeye.clojure.ampache/ampachedb "0.1.1"]
+    [com.madeye.clojure.ampache/ampachedb "0.1.2"]
 
 maven
 
     <dependency>
       <groupId>com.madeye.clojure.ampache</groupId>
       <artifactId>ampachedb</artifactId>
-      <version>0.1.1</version>
+      <version>0.1.2</version>
     </dependency>
 
 ## Usage
