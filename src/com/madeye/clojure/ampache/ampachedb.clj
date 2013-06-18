@@ -187,20 +187,21 @@
   "Function to list songs listened to over particular time period"
   ([start end user]
   (let [ustart (c/to-unix-time start)
-        uend (c/to-unix-time end)]
-    (select object_count 
+        uend (c/to-unix-time end)
+        basequery (-> (select* object_count)
             (fields [:song.title :song] [:artist.name :artist] [:album.name :album] [:date :timestamp] :user [:song.id :songid] [:artist.id :artistid] [:album.id :albumid])
             (join song (= :song.id :object_id))
             (join artist (= :artist.id :song.artist))
             (join album (= :album.id :song.album))
-            (where 
-              (and 
-                (= :object_type "song") 
-                ( > :date ustart ) 
-                ( < :date uend ) 
-              )
-            )
-    )
+        )]
+        (if (nil? user)
+          (-> basequery
+            (where (and (= :object_type "song") ( > :date ustart ) ( < :date uend ) )) (select)
+          )
+          (-> basequery
+            (where (and (= :object_type "song") ( > :date ustart ) ( < :date uend ) (= :user user) )) (select)
+          )
+        )
   ))
   ([start end] (find-song-listen start end nil))
 )
@@ -250,6 +251,8 @@
 
 (defn top-result 
   "Function to deal with all aspects of 'top' functionality"
-  [start end groupfn numrecs]
-  (map transform-top-result (top (find-song-listen  start end) groupfn numrecs))
+  ([start end user groupfn numrecs]
+  (map transform-top-result (top (find-song-listen  start end user) groupfn numrecs)))
+  ([start end groupfn numrecs]
+  (top-result start end nil groupfn numrecs))
 )
