@@ -185,7 +185,7 @@
 
 (defn find-song-listen
   "Function to list songs listened to over particular time period"
-  [start end]
+  ([start end user]
   (let [ustart (c/to-unix-time start)
         uend (c/to-unix-time end)]
     (select object_count 
@@ -201,7 +201,8 @@
               )
             )
     )
-  )
+  ))
+  ([start end] (find-song-listen start end nil))
 )
 
 ; (defn group-map [m] { :artist (:artist m) :id (:artistid m)})
@@ -247,3 +248,8 @@
   "Function to transform the map returned from 'top' into a map containing metadata about the objects with the count merged in"
   [topmap] (conj (find-object (:term topmap)) { :count (:count topmap)} ))
 
+(defn top-result 
+  "Function to deal with all aspects of 'top' functionality"
+  [start end groupfn numrecs]
+  (map transform-top-result (top (find-song-listen  start end) groupfn numrecs))
+)
