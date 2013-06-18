@@ -206,23 +206,17 @@
   ([start end] (find-song-listen start end nil))
 )
 
-; (defn group-map [m] { :artist (:artist m) :id (:artistid m)})
 (defn group-map [idfn namefn m] { :name (namefn m) :id (idfn m) :type namefn})
 
+; A set of functions for creating group maps
 (def group-map-artist (partial group-map :artistid :artist))
 (def group-map-album (partial group-map :albumid :album))
 (def group-map-song (partial group-map :songid :song))
 
-;(def group-artist (partial group-by :artist))
-;(def group-artist (partial group-by group-map))
+; A set of partial functions for grouping by various things
 (def group-artist (partial group-by group-map-artist))
 (def group-album (partial group-by group-map-album))
 (def group-song (partial group-by group-map-song))
-; No more juxts needed as we are grouping on id
-; Need a juxt to ensure it's not a different album of the same name
-; (def group-album (partial group-by (juxt :artist :album)))
-; Ditto different track of the same name
-; (def group-song (partial group-by (juxt :artist :album :song)))
 (def group-timestamp (partial group-by :timestamp))
 (def group-user (partial group-by :user))
 
