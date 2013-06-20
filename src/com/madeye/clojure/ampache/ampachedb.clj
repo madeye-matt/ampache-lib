@@ -185,7 +185,7 @@
 
 (defn find-song-listen
   "Function to list songs listened to over particular time period"
-  ([start end user]
+  ([start end filters]
   (let [ustart (c/to-unix-time start)
         uend (c/to-unix-time end)
         basequery (-> (select* object_count)
@@ -198,12 +198,12 @@
             (where { :date [< uend ] })
         )
         ]
-        (if (nil? user)
+        (if (empty? filters)
           (-> basequery
             (select)
           )
           (-> basequery
-            (where { :user user })
+            (where filters)
             (select)
           )
         )
