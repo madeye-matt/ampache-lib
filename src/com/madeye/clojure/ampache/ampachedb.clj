@@ -193,13 +193,21 @@
             (join song (= :song.id :object_id))
             (join artist (= :artist.id :song.artist))
             (join album (= :album.id :song.album))
-        )]
+        )
+ ;       basewhere (
+ ;           ;[{ :date [> ustart] } { :date [< uend ] }]
+ ;           { :date [between ustart uend] } 
+ ;       )
+        ]
         (if (nil? user)
           (-> basequery
-            (where (and (= :object_type "song") ( > :date ustart ) ( < :date uend ) )) (select)
+            (where { :object_type "song" :date [between ustart uend] }) (select)
+ ;          (where (and (= :object_type "song") ( :date [between ustart uend] ) )) (select)
+ ;           (where basewhere) (select)
           )
           (-> basequery
-            (where (and (= :object_type "song") ( > :date ustart ) ( < :date uend ) (= :user user) )) (select)
+            ;(where (and (= :object_type "song") ( > :date ustart ) ( < :date uend ) (= :user user) )) (select)
+            (where { :object_type "song" :date [between ustart uend] }) (select)
           )
         )
   ))
