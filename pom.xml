@@ -16,7 +16,7 @@
   <scm>
     <connection>scm:git:git://github.com/madeye-matt/ampache-lib.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/madeye-matt/ampache-lib.git</developerConnection>
-    <tag>8d270c80a859e8a228f84467b58cbcb6eaddeb4a</tag>
+    <tag>3f98a37385684fe8d413cf72b3564ed6faed69b0</tag>
     <url>https://github.com/madeye-matt/ampache-lib</url>
   </scm>
   <build>
@@ -79,7 +79,7 @@
     <dependency>
       <groupId>com.madeye.clojure.common</groupId>
       <artifactId>common</artifactId>
-      <version>0.1.1</version>
+      <version>0.1.2</version>
     </dependency>
   </dependencies>
 </project>
