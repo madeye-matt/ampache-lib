@@ -2,3 +2,5 @@ target
 .lein-repl-history
 .lein-failures
 pom.xml.asc
+.idea
+ampachedb.iml

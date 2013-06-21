@@ -185,9 +185,10 @@
 
 (defn find-song-listen
   "Function to list songs listened to over particular time period"
-  ([start end filters]
-  (let [ustart (c/to-unix-time start)
-        uend (c/to-unix-time end)
+  ([filters]
+  (let [ustart (c/to-unix-time (:start filters))
+        uend (c/to-unix-time (:end filters))
+        filters (dissoc filters :start :end)
         basequery (-> (select* object_count)
             (fields [:song.title :song] [:artist.name :artist] [:album.name :album] [:date :timestamp] :user [:song.id :songid] [:artist.id :artistid] [:album.id :albumid])
             (join song (= :song.id :object_id))
@@ -208,7 +209,6 @@
           )
         )
   ))
-  ([start end] (find-song-listen start end nil))
 )
 
 (defn group-map [idfn namefn m] { :name (namefn m) :id (idfn m) :type namefn})
@@ -250,8 +250,6 @@
 
 (defn top-result 
   "Function to deal with all aspects of 'top' functionality"
-  ([start end user groupfn numrecs]
-  (map transform-top-result (top (find-song-listen  start end user) groupfn numrecs)))
-  ([start end groupfn numrecs]
-  (top-result start end nil groupfn numrecs))
+  ([filters groupfn numrecs]
+  (map transform-top-result (top (find-song-listen  filters) groupfn numrecs)))
 )
