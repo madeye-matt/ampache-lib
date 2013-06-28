@@ -101,7 +101,14 @@
 
 (defn find-artist 
   "Find an artist with given a map with 'where' parameters"
-  [m] (select artist (where m)))
+  ([m min-fields] 
+    (if min-fields
+      (select artist (fields :prefix :name :id) (where m))
+      (select artist (where m))
+    )
+  )
+  ([m] (find-artist m true))
+)
 
 (defn find-artist-by-name 
   "Find an artist with a given name"
@@ -111,7 +118,7 @@
   "Find an artist with a given id"
   [id] (find-artist { :id id }))
 
-(defn- get-artist-name
+(defn get-artist-name
   "Ampache has quite a bad habit of just dropping the prefix from artist names - so The Rolling Stones becomes just Rolling Stones. This function attempts to guess the artist name by trying the whole name, then trying the name with the prefix, if any, dropped"
   [s]
   (let [a (find-artist-by-name s)]

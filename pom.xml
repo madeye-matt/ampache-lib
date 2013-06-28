@@ -3,7 +3,7 @@
   <groupId>com.madeye.clojure.ampache</groupId>
   <artifactId>ampachedb</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.5</version>
+  <version>0.1.6</version>
   <name>ampachedb</name>
   <description>A set of Clojure libraries for interacting with ampache music server through it's database</description>
   <url>https://github.com/madeye-matt/ampache-lib</url>
@@ -16,7 +16,7 @@
   <scm>
     <connection>scm:git:git://github.com/madeye-matt/ampache-lib.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/madeye-matt/ampache-lib.git</developerConnection>
-    <tag>be227596edb8c3c1bdc13ce53939c8c9f047341d</tag>
+    <tag>1e7effb39cfcfd4c507da0f31b0ef28e6d8d37af</tag>
     <url>https://github.com/madeye-matt/ampache-lib</url>
   </scm>
   <build>
