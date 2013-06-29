@@ -107,16 +107,20 @@
       (select artist (where m))
     )
   )
-  ([m] (find-artist m true))
+  ([m] (find-artist m false))
 )
 
 (defn find-artist-by-name 
   "Find an artist with a given name"
-  [name] (find-artist (split-name-string name)))
+  ([name] (find-artist-by-name name false))
+  ([name min-fields] (find-artist (split-name-string name) min-fields))
+)
 
 (defn find-artist-by-id 
   "Find an artist with a given id"
-  [id] (find-artist { :id id }))
+  ([id min-fields] (find-artist { :id id } min-fields))
+  ([id] (find-artist-by-id id false))
+)
 
 (defn get-artist-name
   "Ampache has quite a bad habit of just dropping the prefix from artist names - so The Rolling Stones becomes just Rolling Stones. This function attempts to guess the artist name by trying the whole name, then trying the name with the prefix, if any, dropped"
@@ -136,14 +140,23 @@
 
 (defn find-album 
   "Find an album with given a map with 'where' parameters"
-  [m] (select album (where m)))
-  ;[m] (select album (with song) (where m)))
+  ([m min-fields] 
+    (if min-fields
+      (select album (fields :prefix :name :id ) (where m))
+      (select album (where m))
+    ))
+  ([m] (find-album m false))
+)
 (defn find-album-by-name 
   "Find an album with a given name"
-  [name] (find-album (split-name-string name)))
+  ([name] (find-album-by-name name false))
+  ([name min-fields] (find-album (split-name-string name) min-fields))
+)
 (defn find-album-by-id 
   "Find an album with a given id"
-  [id] (find-album {:id id}))
+  ([id min-fields] (find-album {:id id} min-fields))
+  ([id] (find-album-by-id id false))
+)
 
 (defn find-user 
   "Find an Ampache user with given a map with 'where' parameters"
@@ -163,14 +176,20 @@
 )
 (defn find-song-by-map
     "Utility function to pull the parameters to find-song from a map with the keywords :song, :album, :artist"
-    [m]
-    (select song (where m))
-;    (find-song (:song m) (:album m) (:artist m))
+    ([m] (find-song-by-map m false))
+    ([m min-fields] 
+      (if min-fields
+        (select song (fields :title :artist :album :id) (where m))
+        (select song (where m))
+      )
+    )
 )
 
 (defn find-song-by-id 
   "Find a song with a given id"
-  [id] (find-song-by-map {:id id}))
+  ([id] (find-song-by-id id false))
+  ([id min-fields] (find-song-by-map {:id id} min-fields))
+)
 
 (defn song-listened 
     "Create a record of a song being listened to at a particular time"
@@ -241,22 +260,26 @@
 
 (defn find-object 
   "Accepts a map with :id and :type and returns a map representing the specified artist, album or song"
-  [m] (case (:type m) 
+  ([m min-fields] (case (:type m) 
         :artist 
-          (conj (first (find-artist-by-id (:id m))) { :type :artist })
+          (conj (first (find-artist-by-id (:id m) min-fields)) { :type :artist })
         :album 
-          (conj (first (find-album-by-id (:id m))) { :type :album })
+          (conj (first (find-album-by-id (:id m) min-fields)) { :type :album })
         :song 
-          (conj (first (find-song-by-id (:id m))) { :type :song })
+          (conj (first (find-song-by-id (:id m) min-fields)) { :type :song })
       )
+  )
+  ([m] (find-object m false))
 )
 
 (defn transform-top-result 
   "Function to transform the map returned from 'top' into a map containing metadata about the objects with the count merged in"
-  [topmap] (conj (find-object (:term topmap)) { :count (:count topmap)} ))
+  ([topmap] (transform-top-result topmap false))
+  ([min-fields topmap] (conj (find-object (:term topmap) min-fields) { :count (:count topmap)} )))
+
+(def transform-top-result-min-fields (partial transform-top-result true))
 
 (defn top-result 
   "Function to deal with all aspects of 'top' functionality"
-  ([filters groupfn numrecs]
-  (map transform-top-result (top (find-song-listen  filters) groupfn numrecs)))
+  ([filters groupfn numrecs] (map transform-top-result-min-fields (top (find-song-listen  filters) groupfn numrecs)))
 )
