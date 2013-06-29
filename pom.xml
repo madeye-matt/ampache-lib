@@ -16,7 +16,7 @@
   <scm>
     <connection>scm:git:git://github.com/madeye-matt/ampache-lib.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/madeye-matt/ampache-lib.git</developerConnection>
-    <tag>2e6f2558c89209325d04f39feaaa607e7c228570</tag>
+    <tag>d9d45ef74b576b67c026b366fcab8d02563d5a34</tag>
     <url>https://github.com/madeye-matt/ampache-lib</url>
   </scm>
   <build>
