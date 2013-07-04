@@ -122,7 +122,7 @@
   ([id] (find-artist-by-id id false))
 )
 
-(defn get-artist-name
+(defn- guess-artist-name
   "Ampache has quite a bad habit of just dropping the prefix from artist names - so The Rolling Stones becomes just Rolling Stones. This function attempts to guess the artist name by trying the whole name, then trying the name with the prefix, if any, dropped"
   [s]
   (let [a (find-artist-by-name s)]
@@ -172,7 +172,7 @@
     "Function to find a song supplying the song name, plus optional album name, plus optional artist name - please note, if artist name is supplied then album name is not optional"
     ([title] (select song (where {:title title})))
     ([title albump] (select song (with album) (where (assoc (build-join-map "album" albump) :title title))))
-    ([title albump artistp] (select song (with album) (with artist) (where (assoc (conj (build-join-map "album" albump) (build-join-map "artist" (get-artist-name artistp))) :title title ))))
+    ([title albump artistp] (select song (with album) (with artist) (where (assoc (conj (build-join-map "album" albump) (build-join-map "artist" (guess-artist-name artistp))) :title title ))))
 )
 (defn find-song-by-map
     "Utility function to pull the parameters to find-song from a map with the keywords :song, :album, :artist"
@@ -258,13 +258,28 @@
     ([m] (top m group-artist))
 )
 
+(defn- get-name
+  "Gets the name of an album or artist - merging the prefix field with the name if necessary"
+  [m]
+  (if-let [prefix (:prefix m)]
+    (str prefix " " (:name m))
+    (:name m)
+  )
+)
+
+(defn- replace-prefix-with-full-name
+ "Replaces the :prefix/:name combo with a single :name entry that contains the full name"
+ [m]
+ (dissoc (assoc m :name (get-name m)) :prefix)
+)
+
 (defn find-object 
   "Accepts a map with :id and :type and returns a map representing the specified artist, album or song"
   ([m min-fields] (case (:type m) 
         :artist 
-          (conj (first (find-artist-by-id (:id m) min-fields)) { :type :artist })
+          (replace-prefix-with-full-name (conj (first (find-artist-by-id (:id m) min-fields)) { :type :artist }))
         :album 
-          (conj (first (find-album-by-id (:id m) min-fields)) { :type :album })
+          (replace-prefix-with-full-name (conj (first (find-album-by-id (:id m) min-fields)) { :type :album }))
         :song 
           (conj (first (find-song-by-id (:id m) min-fields)) { :type :song })
       )
