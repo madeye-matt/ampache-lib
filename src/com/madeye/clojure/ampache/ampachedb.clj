@@ -15,6 +15,14 @@
 (declare config database-config db default-top)
 (declare artist album song user object_count)
 
+(def date-formatter (tfmt/formatter "yyyy-MM-dd HH:mm:ss"))
+
+(defn- add-timestamp
+  "Adds a :timestamp entry to the map containing the formatted version of the :date"
+  [m]
+  (assoc m :timestamp (tfmt/unparse date-formatter (c/from-unix-time (:date m))))
+)
+
 (defn initialise
   "Initialisation function accepting the name of a properties file containing the database configuration - must be called before calling any of the other functions"
   [config-file]
@@ -61,6 +69,7 @@
       (table :object_count)
       (database db)
       (entity-fields :object_type :object_id :date :user)
+      (transform (fn [m] (add-timestamp m)))
       (belongs-to user { :fk :user })
   )
 
@@ -216,10 +225,11 @@
         uend (c/to-unix-time (:end filters))
         filters (dissoc filters :start :end)
         basequery (-> (select* object_count)
-            (fields [:song.title :song] [:artist.name :artist] [:album.name :album] [:date :timestamp] :user [:song.id :songid] [:artist.id :artistid] [:album.id :albumid])
+            (fields [:song.title :song] [:artist.name :artist] [:album.name :album] :date [:user.fullname :user] [:song.id :songid] [:artist.id :artistid] [:album.id :albumid])
             (join song (= :song.id :object_id))
             (join artist (= :artist.id :song.artist))
             (join album (= :album.id :song.album))
+            (join user (= :user.id :user))
             (where { :object_type "song" } )
             (where { :date [> ustart ] })
             (where { :date [< uend ] })
@@ -273,6 +283,12 @@
  (dissoc (assoc m :name (get-name m)) :prefix)
 )
 
+(defn- replace-unix-time
+  "Replaces Unix time in :date field with formatted time in :timestamp field"
+  [m]
+  (dissoc (add-timestamp m) :date)
+)
+
 (defn find-object 
   "Accepts a map with :id and :type and returns a map representing the specified artist, album or song"
   ([m min-fields] (case (:type m) 
@@ -290,11 +306,13 @@
 (defn transform-top-result 
   "Function to transform the map returned from 'top' into a map containing metadata about the objects with the count merged in"
   ([topmap] (transform-top-result topmap false))
-  ([min-fields topmap] (conj (find-object (:term topmap) min-fields) { :count (:count topmap)} )))
+  ; ([min-fields topmap] (replace-unix-time (conj (find-object (:term topmap) min-fields) { :count (:count topmap)} )))
+  ([min-fields topmap] (conj (find-object (:term topmap) min-fields) { :count (:count topmap)} ))
+)
 
 (def transform-top-result-min-fields (partial transform-top-result true))
 
 (defn top-result 
   "Function to deal with all aspects of 'top' functionality"
-  ([filters groupfn numrecs] (map transform-top-result-min-fields (top (find-song-listen  filters) groupfn numrecs)))
+  ([filters groupfn numrecs] (map transform-top-result-min-fields (top (find-song-listen filters) groupfn numrecs)))
 )
